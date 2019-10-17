@@ -1,0 +1,69 @@
+
+什么是容器
+物理机上实施隔离 启动一个容器像启动进程
+
+
+核心技术 Cgroup 资源管理
+	namespace 进程隔离
+	selinux安全
+命名空间 ---修改本机而不影响其他人使用
+  主机名  网络   文件系统  进程  信号向量(kill)  用户
+
+
+docker 完整的容器管理系统  
+条件 需要64位uname -r 至少6.5,推荐7  关闭防火墙
+
+缺点   容器的隔离性没有虚拟化强 公用linux内核  selinux  排除难
+
+docker version 查看版本
+docker images 查看本机可用的镜像  (一般从 https://hub.docker.com下载修改)
+docker search  busybox 搜索
+docker pull   下载
+docker push  上传
+docker save  名称:标签 -o 取名    打包备份
+	docker save docker.io/busybox:latest -o qq.tar
+docker load -i qq.tar  恢复镜像
+删除镜像 docker rmi docker.io/busybox:latest
+RH-extra 挂载在 ftp 下
+ 配置yum源
+安装docker
+
+
+创建容器
+docker ps 查看
+正在使用容器信息
+docker ps -a 查看所有容器信息
+docker ps -aq 查看容器id
+docker top (id) 查看容器进程列表
+docker start (id) 启动已存在的容器
+docker stop  (id)  停止容器
+docker restart (id) 重启
+docker run(创建加启动)  -it docker.io/busybox:latest /bin/sh
+ 后方/bin/sh 需要镜像的/bin下有才行
+docker run -itd docker.io/nginx:latest  后台执行
+	测试 curl 172.17.0.2 (默认)azXSWDXWDXD
+docker history  docker.io/busybox:latest(可写id) 查看镜像为几层
+docker inspect docker.io/busybox:latest(可写id)   查询详细信息
+	"Env": [ 环境变量
+	"Cmd": [ 默认启动命令
+docker tag docker.io/busybox:latest  zht:latest 快捷方式镜像
+
+删除所有容器
+docker rm $(docker ps -aq)
+进入容器
+docker  attach  (id)  进入容器 exit会导致容器关闭
+docker  exec  -it  (id)  /bin/bash  进入容器 exit不会导致容器关闭
+
+
+redhat  debian
+rpm	   dpkg
+yum	   apt-get
+.rpm	   .deb
+
+
+
+
+
+
+
+
