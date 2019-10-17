@@ -24,14 +24,11 @@ docker save  名称:标签 -o 取名    打包备份
 	docker save docker.io/busybox:latest -o qq.tar
 docker load -i qq.tar  恢复镜像
 删除镜像 docker rmi docker.io/busybox:latest
-RH-extra 挂载在 ftp 下
- 配置yum源
-安装docker
+
+安装yum -y install docker
 
 
-创建容器
-docker ps 查看
-正在使用容器信息
+docker ps 查看正在使用容器信息
 docker ps -a 查看所有容器信息
 docker ps -aq 查看容器id
 docker top (id) 查看容器进程列表
@@ -41,9 +38,9 @@ docker restart (id) 重启
 docker run(创建加启动)  -it docker.io/busybox:latest /bin/sh
  后方/bin/sh 需要镜像的/bin下有才行
 docker run -itd docker.io/nginx:latest  后台执行
-	测试 curl 172.17.0.2 (默认)azXSWDXWDXD
+	测试 curl 172.17.0.2 (容器的ip)  azXSWDXWDXD(容器ID)
 docker history  docker.io/busybox:latest(可写id) 查看镜像为几层
-docker inspect docker.io/busybox:latest(可写id)   查询详细信息
+docker inspect docker.io/busybox:latest(可写id)   查询详细信息 查看容器的ip
 	"Env": [ 环境变量
 	"Cmd": [ 默认启动命令
 docker tag docker.io/busybox:latest  zht:latest 快捷方式镜像
@@ -55,11 +52,69 @@ docker  attach  (id)  进入容器 exit会导致容器关闭
 docker  exec  -it  (id)  /bin/bash  进入容器 exit不会导致容器关闭
 
 
-redhat  debian
-rpm	   dpkg
-yum	   apt-get
-.rpm	   .deb
+创建镜像
+docker commit 容器id 命名
+(常用命令安装 net-tools  psmisc vim bash-completion)
 
+dockerfile --必须要用dockerfile命名
+内容
+
+FROM  docker.io/centos:latest  基础镜像
+maintainer 镜像创建者
+RUN rm -rf /etc/yum.repos.d/*  要执行的命令
+add  localfile(!!只支持当前路径)  remotefile把文件传到镜像中
+RUN 制作镜像时执行的命令 可以有多个
+workdir 重新定义容器默认路径
+CMD ["/bin/bash"]  默认启动格式(空格用,代替)        ###启动命令可以参考 /usr/lib/systemd/system/相应文件   
+ENV 环境变量         ###启动命令可以参考 /usr/lib/systemd/system/相应文件
+expose 开放的端口
+:wq
+
+
+使用docker脚本创建镜像
+docker build -t  命名 -f dockerfile路径
+
+
+私有镜像仓库
+仓库服务器----镜像共有
+安装docker-distribution
+开机并开机自启
+配置文件 /etc/docker-distribution/registry/config.yml
+!!访问镜像仓库
+仓库ip:5000/v2/_catalog
+查看某仓库的标签
+curl 仓库ip:5000/v2/仓库名/tar/
+
+docker服务器需要配置 /etc/sysconfig/docker
+ADD_REGISTRY='--add-registry 仓库ip:5000'
+INSECURE_REGISTRY='--insecure-registry 仓库ip:5000'
+重启 docker
+docker容器上传镜像
+方式1(默认上传到配置文件的仓库)  docker push 容器名  
+方式2(会传到目标仓库) docker tar 镜像:标签  仓库ip:5000
+			docker push 镜像:标签 
+局域网内使用镜像 
+docker run -it 仓库ip:5000/镜像名
+
+
+
+卷 
+容器内不保存任何数据
+重要的数据使用外部卷
+
+把外部的文件夹塞入容器内部 /var/zz和abc为同一个文件夹  可作为容器间数据共享
+docker run -it -v /var/zz:/abc -v /var/hhh:/cba 镜像
+
+
+
+docker网络
+创建新的交换机
+docker network create --subnet=网段/24 docker1
+使用
+docker run -it --network=docke1 镜像名
+
+绑定端口 
+docker run -itd -p 80:80 镜像
 
 
 
